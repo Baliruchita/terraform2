@@ -11,8 +11,10 @@ on:
         default: eu-west-1
       program:
         type: string
+        default: datalake
       account_id:
         type: string
+        default: "483416847573"
 
   push:
     branches: [ "main" ]
@@ -24,6 +26,11 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_environment: ${{ inputs.environment || 'dev' }}
+      TF_VAR_region:      ${{ inputs.region || 'eu-west-1' }}
+      TF_VAR_program:     ${{ inputs.program || 'datalake' }}
+      TF_VAR_account_id:  ${{ inputs.account_id || '483416847573' }}
 
     steps:
       - name: Checkout
@@ -45,13 +52,9 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        env:
-          TF_VAR_environment: ${{ inputs.environment }}
-          TF_VAR_region: ${{ inputs.region }}
-          TF_VAR_program: ${{ inputs.program }}
-          TF_VAR_account_id: ${{ inputs.account_id }}
         run: terraform plan -input=false -no-color -out=tfplan.bin
 
       - name: Terraform Apply (auto-approve for demo)
         if: github.ref == 'refs/heads/main'
         run: terraform apply -auto-approve -input=false tfplan.bin
+``
