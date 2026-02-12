@@ -54,7 +54,9 @@ jobs:
       - name: Terraform Plan
         run: terraform plan -input=false -no-color -out=tfplan.bin
 
-  
+      - name: Terraform Apply (auto-approve for demo)
+        if: github.ref == 'refs/heads/main'
+        run: terraform apply -auto-approve -input=false tfplan.bin
 
       - name: Terraform Destroy (auto-approve)
         if: github.ref == 'refs/heads/main'
