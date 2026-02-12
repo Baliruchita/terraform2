@@ -3,13 +3,6 @@ name: Terraform EC2 via OIDC (No Secrets in GitHub)
 on:
   workflow_dispatch:
     inputs:
-      mode:
-        description: "Choose apply or destroy"
-        type: choice
-        options:
-          - apply
-          - destroy
-        default: apply
       environment:
         type: string
         default: dev
@@ -59,13 +52,10 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
-        if: ${{ inputs.mode == 'apply' }}
         run: terraform plan -input=false -no-color -out=tfplan.bin
 
-      - name: Terraform Apply (auto-approve for demo)
-        if: ${{ inputs.mode == 'apply' && github.ref == 'refs/heads/main' }}
-        run: terraform apply -auto-approve -input=false tfplan.bin
+  
 
       - name: Terraform Destroy (auto-approve)
-        if: ${{ inputs.mode == 'destroy' }}
+        if: github.ref == 'refs/heads/main'
         run: terraform destroy -auto-approve -input=false
